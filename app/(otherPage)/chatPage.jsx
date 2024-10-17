@@ -63,20 +63,9 @@ const chatPage = () => {
       setmarginb(0.5)
     };
 
-    /* useEffect(() => {
-      loadDatabase()
-        .then(() => {
-            createTables();
-        })
-        .catch((e) =>{
-          console.log('error here in useEffect');
-          console.error(e)
-        } );
-    }, []); */
+  
 
-    
-
-    async function createTables(){
+    /* async function createTables(){
       try{
         //console.log('inside createtables function')
         //DROP TABLE IF EXISTS FutureSelf;
@@ -106,7 +95,7 @@ const chatPage = () => {
           console.error(err)
       }
     }  
-
+ */
     useEffect(()=>{
       db.withTransactionAsync(async ()=>{
         await fetchMessages();
@@ -131,7 +120,7 @@ const chatPage = () => {
   
 
     const postMessageToFlask = async (message)=>{
-        let response = await axios.post('http://192.168.188.79:5000/sendMessage', { userPrompt: message },{ headers: { 'Content-Type': 'application/json' } } );
+        let response = await axios.post('http://192.168.0.102:5000/sendMessage', { userPrompt: message },{ headers: { 'Content-Type': 'application/json' } } );
         const Response = response.data["response"]
 
         console.log('Parsed server response:', Response);

@@ -6,6 +6,8 @@ import {icons} from "../../constants"
 import { FA5Style } from '@expo/vector-icons/build/FontAwesome5'
 import customHeader from '../../components/customHeader';
 import { SQLiteProvider } from 'expo-sqlite/next';
+import loadDatabase from '../../services/databaseIn';
+import * as SQLite from 'expo-sqlite';
 
 const TabIcon = ({icon , color , name , focused}) =>{
   return (
@@ -24,14 +26,97 @@ const TabIcon = ({icon , color , name , focused}) =>{
 }
 
 const tabsLayout = () => {
+  db = SQLite.useSQLiteContext()
+  const createTablesAtFirst = async ()=>{
+    try{//create a primary id for all the userFile tables
+       /* DROP TABLE IF EXISTS userFile1;
+      DROP TABLE IF EXISTS userFile2;
+      DROP TABLE IF EXISTS tableMetaData;
+      INSERT INTO userFile1 (id,entry) VALUES (1,'Gratitude Journal');
+      INSERT INTO userFile1 (id,entry) VALUES (2,'');
+      INSERT INTO userFile2 (id,entry) VALUES (1,'Goal Trackers');
+      INSERT INTO userFile2 (id,entry) VALUES (2,'');
+      INSERT INTO tableMetaData (id,tableName,title,line1,line2, line3) VALUES (1,'userFile1','Gratitude Journal','','','');
+      INSERT INTO tableMetaData (id,tableName,title,line1,line2, line3) VALUES (2,'userFile2','Goal Trackers','','',''); */
+      await db.execAsync(
+        `
+        CREATE TABLE IF NOT EXISTS userFile1 (
+        primaryID INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER NOT NULL,
+        entry TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        
+        CREATE TABLE IF NOT EXISTS userFile2 (
+        primaryID INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER NOT NULL,
+        entry TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+        
+        CREATE TABLE IF NOT EXISTS tableMetaData (
+        primaryID INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER NOT NULL,
+        tableName TEXT NOT NULL,
+        title TEXT,
+        line1 TEXT,
+        line2 TEXT,
+        line3 TEXT
+        );
+        
+        `
+      )
+    }catch(err){
+      console.error('error while creating permanent tables')
+      console.error(err)
+    }
+    
+  }
+
+  async function createTables(){
+      try{
+        //console.log('inside createtables function')
+        //DROP TABLE IF EXISTS FutureSelf;
+        
+        await db.execAsync(
+          ` 
+            
+            
+            CREATE TABLE IF NOT EXISTS futureSelf (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender TEXT NOT NULL CHECK (sender IN ('User', 'ChatBot')),
+            message TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS AIfriend (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender TEXT NOT NULL CHECK (sender IN ('User', 'ChatBot')),
+            message TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
+            
+          `
+        ) 
+      }
+      catch(err){
+          console.error(err)
+      }
+    }  
+
+  createTablesAtFirst()
+  createTables()
+
   return (
-    <SQLiteProvider databaseName='chatBot.db' useSuspense>
+    //<SQLiteProvider databaseName='chatBot.db' useSuspense>
     <Tabs screenOptions={{ tabBarActiveTintColor: '#FFA001' ,tabBarShowLabel:false , tabBarInactiveTintColor:'#CDCDE0' , tabBarStyle:{
       backgroundColor: '#161622',
       borderTopWidth: 1,
       borderTopColor: '#232533',
       height:84,
-    } }}>
+      
+    } 
+    }}>
       <Tabs.Screen
         name="home"
         options={{
@@ -64,14 +149,14 @@ const tabsLayout = () => {
         options={{
           title: 'profile',
           tabBarIcon: ({ color , focused}) => (<TabIcon color={color} focused={focused} icon={icons.profile} name="profile" />),
-          
+          headerShown:false,
         }}
       />
 
       
       
     </Tabs>
-    </SQLiteProvider>
+    //</SQLiteProvider>
   );
 }
 

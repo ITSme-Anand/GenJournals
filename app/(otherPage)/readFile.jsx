@@ -19,12 +19,7 @@ const readFile = () => {
   const [currentlyFocused, setcurrentlyFocused] = useState(1)
   
   const db = SQLite.useSQLiteContext()
-  /* useEffect(() => {
-    loadDatabase().then(console.log('database loaded'))
-      .catch((e) => console.error(e));
-  }, []);*/
-
-
+ 
   let details;
   try{
     details = useLocalSearchParams(details)
@@ -94,7 +89,7 @@ const readFile = () => {
     const tableName = fileDetails['tableName']
     
     try {
-      await db.withExclusiveTransactionAsync(async () => {
+      await db.withTransactionAsync(async () => {
         // Prepare your insert statement
         await db.execAsync(
           `DELETE FROM ${tableName};`

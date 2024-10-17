@@ -14,6 +14,7 @@ import AsyncStorage, { useAsyncStorage } from '@react-native-async-storage/async
 import { getAuth } from 'firebase/auth';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
 const signUp = () => {
   const [form, setForm] = useState({
     userName:'',
@@ -37,6 +38,8 @@ const signUp = () => {
       .catch((err)=>{
         console.log(error)
       });
+      AsyncStorage.setItem('AIfriendName', 'AI Friend').catch(err=>console.log(err))
+      AsyncStorage.setItem('futureSelfName','Future-Self').catch(err=>console.log(err))
       const author = getAuth();
       const currentUser = author.currentUser;
       if(currentUser){

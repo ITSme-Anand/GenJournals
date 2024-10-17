@@ -40,14 +40,10 @@ const fileSpace = () => {
   //db opening
   const db = SQLite.useSQLiteContext()
   
-  /* useEffect(() => {
-    loadDatabase().then(createTablesAtFirst)
-      .catch((e) => console.error(e));
-  }, []); */
 
-  /* useEffect(()=>{
+  useEffect(()=>{
     fetchAllTables();
-  } , []) */
+  } , [])
 
 
   //this is called whenever a file is created or deleted and each time we come out of the readFile component back to the fileSpace
@@ -91,9 +87,9 @@ const fileSpace = () => {
   }
 
   //does not run in transaction. this function should be called only once. maybe try to keep this function independent of all the components
-  const createTablesAtFirst = async ()=>{
+  /* const createTablesAtFirst = async ()=>{
     try{//create a primary id for all the userFile tables
-      /* DROP TABLE IF EXISTS userFile1;
+       DROP TABLE IF EXISTS userFile1;
       DROP TABLE IF EXISTS userFile2;
       DROP TABLE IF EXISTS tableMetaData;
       INSERT INTO userFile1 (id,entry) VALUES (1,'Gratitude Journal');
@@ -101,7 +97,7 @@ const fileSpace = () => {
       INSERT INTO userFile2 (id,entry) VALUES (1,'Goal Trackers');
       INSERT INTO userFile2 (id,entry) VALUES (2,'');
       INSERT INTO tableMetaData (id,tableName,title,line1,line2, line3) VALUES (1,'userFile1','Gratitude Journal','','','');
-      INSERT INTO tableMetaData (id,tableName,title,line1,line2, line3) VALUES (2,'userFile2','Goal Trackers','','',''); */
+      INSERT INTO tableMetaData (id,tableName,title,line1,line2, line3) VALUES (2,'userFile2','Goal Trackers','','','');
       await db.execAsync(
         `
         CREATE TABLE IF NOT EXISTS userFile1 (
@@ -135,7 +131,7 @@ const fileSpace = () => {
       console.error(err)
     }
     
-  }
+  } */
 
   //functions for handling creation and searching
   const createFile = async ()=>{
