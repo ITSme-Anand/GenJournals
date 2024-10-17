@@ -12,30 +12,19 @@ import loadDatabase from '../../services/databaseIn';
 import { FlatList } from 'react-native';
 const readFile = () => {
   const router = useRouter();
-  const [text, setText] = React.useState("");
+  const [text, setText] = useState("");
   const [allData, setAllData] = useState(null)
   const [dataLoaded, setdataLoaded] = useState(false)
   const [newEntryID, setnewEntryID] = useState(0)
   const [currentlyFocused, setcurrentlyFocused] = useState(1)
-  const handleKeyPress = (nativeEvent, entry) => {
-    if(nativeEvent['key']=="Enter"){
-      console.log('enter is pressed')
-      console.log('entry is ', entry)
-      console.log('the new entry to be created is of id ', newEntryID);
-      const index = allData.findIndex((item) => item['id'] === entry['id']);
-      let newEntries = allData.map(item=>item);
-      newEntries.splice(index+1 , 0 , {"entry":"","id":newEntryID,"timestamp":""})
-      console.log(newEntries)
-      setcurrentlyFocused(newEntryID)
-      setnewEntryID(newEntryID+1)
-      setAllData(newEntries)
-    }
-  };
+  
   const db = SQLite.useSQLiteContext()
-  useEffect(() => {
+  /* useEffect(() => {
     loadDatabase().then(console.log('database loaded'))
       .catch((e) => console.error(e));
-  }, []);
+  }, []);*/
+
+
   let details;
   try{
     details = useLocalSearchParams(details)
@@ -100,21 +89,6 @@ const readFile = () => {
     }
   }
 
-  const saveTheData = (fileDetails , entryDetails , newEntry)=>{
-    //what this function is doing? whenever an input box text is changed , we will change it here
-    entryDetails['entry'] = newEntry.trimEnd();
-    console.log('new entry is', entryDetails)
-    const FileEntries = allData.map((item)=>{
-      if(item['id']==entryDetails['id']){
-        return entryDetails
-      }
-      else{
-        return item
-      }
-    })
-    console.log('new file entries are:' , FileEntries);
-    setAllData(FileEntries)
-  }
 
   const handleBackButton = async (fileDetails) =>{
     const tableName = fileDetails['tableName']
@@ -140,8 +114,12 @@ const readFile = () => {
         const line3 = allData[3]?allData[3]['entry']:'';
         
         await db.execAsync(
-          `UPDATE tableMetaData SET title='${title}',line1='${line1}',line2='${line2}',line3='${line3}' WHERE tableName = '${tableName}';`
+          `UPDATE tableMetaData SET title='${title}',line1='${line1}',line2='${line2}',line3='${line3}' WHERE tableName = '${tableName}';
+          
+          `
+          
         )
+        console.log('committed')
       });
   
       console.log('Data inserted successfully');
@@ -149,6 +127,43 @@ const readFile = () => {
       console.error('Error inserting data:', error);
     }
   };
+
+
+
+
+  //the functions which are not interacting with sql
+
+  
+  const handleKeyPress = (nativeEvent, entry) => {
+    if(nativeEvent['key']=="Enter"){
+      console.log('enter is pressed')
+      console.log('entry is ', entry)
+      console.log('the new entry to be created is of id ', newEntryID);
+      const index = allData.findIndex((item) => item['id'] === entry['id']);
+      let newEntries = allData.map(item=>item);
+      newEntries.splice(index+1 , 0 , {"entry":"","id":newEntryID,"timestamp":""})
+      console.log(newEntries)
+      setcurrentlyFocused(newEntryID)
+      setnewEntryID(newEntryID+1)
+      setAllData(newEntries)
+    }
+  };
+
+  const saveTheData = (fileDetails , entryDetails , newEntry)=>{
+    //what this function is doing? whenever an input box text is changed , we will change it here
+    entryDetails['entry'] = newEntry.trimEnd();
+    console.log('new entry is', entryDetails)
+    const FileEntries = allData.map((item)=>{
+      if(item['id']==entryDetails['id']){
+        return entryDetails
+      }
+      else{
+        return item
+      }
+    })
+    console.log('new file entries are:' , FileEntries);
+    setAllData(FileEntries)
+  }
 
 
   return (

@@ -2,9 +2,6 @@ import { ActivityIndicator, Platform, Text, View } from "react-native";
 import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
 import React from "react";
-import * as SQLite from "expo-sqlite";
-
-let db;
 
 const loadDatabase = async () => {
     const dbName = "chatBot.db";
@@ -20,9 +17,6 @@ const loadDatabase = async () => {
       await FileSystem.downloadAsync(dbUri, dbFilePath);
     }
   };
-
-
-
 
 
 

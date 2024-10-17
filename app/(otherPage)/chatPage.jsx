@@ -18,7 +18,8 @@ import CustomKeyboardView from '../../components/CustomKeyboardView';
 import * as SQLite from 'expo-sqlite';
 import { useEffect } from 'react'
 import loadDatabase from '../../services/databaseIn'
-
+import { Suspense } from 'react'
+import { SQLiteProvider } from 'expo-sqlite/next'
 import { Platform } from 'react-native'
 import { KeyboardAvoidingView } from 'react-native'
 import axios from 'axios'
@@ -38,6 +39,7 @@ const chatPage = () => {
     const [dbLoaded, setDbLoaded] = useState(false)
     const db = SQLite.useSQLiteContext();
 
+    //this is useEffect for keyBoard
     useEffect(() => {
       const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', _keyboardDidShow);
       const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', _keyboardDidHide);
@@ -57,11 +59,11 @@ const chatPage = () => {
   
     const _keyboardDidHide = () => {
       // Handle keyboard hidden
-      setKeyboardOn(0)
+      setKeyboardOn(5)
       setmarginb(0.5)
     };
 
-    useEffect(() => {
+    /* useEffect(() => {
       loadDatabase()
         .then(() => {
             createTables();
@@ -70,7 +72,7 @@ const chatPage = () => {
           console.log('error here in useEffect');
           console.error(e)
         } );
-    }, []);
+    }, []); */
 
     
 
@@ -79,7 +81,7 @@ const chatPage = () => {
         //console.log('inside createtables function')
         //DROP TABLE IF EXISTS FutureSelf;
         
-        await db.runAsync(
+        await db.execAsync(
           ` 
             
             
@@ -107,28 +109,18 @@ const chatPage = () => {
 
     useEffect(()=>{
       db.withTransactionAsync(async ()=>{
-        console.log('I"m using the database')
         await fetchMessages();
+        
       })
     } , [db])
 
     async function fetchMessages(){
-
       try{
-        /* if(!messages){ */
-          const result = await db.getAllAsync(`SELECT * FROM ${item['TableName']}`)
-          //console.log('result is' , result)
-          setMessages(result)
-        /* } */
-        /* else{
-          const result = await db.getAllAsync("SELECT * FROM futureSelf ORDER BY id DESC LIMIT 1;")
-          const messagesCopy = messages
-          messagesCopy.push(result[0])
-          
-          console.log('message appended successfully')
-          console.log(messages)
-        } */
+        const result = await db.getAllAsync(
+          `SELECT * FROM ${item['TableName']}
+          `) 
         
+        setMessages(result)
       }
       catch(e){
         console.log('error here in fetch messages')
@@ -139,7 +131,7 @@ const chatPage = () => {
   
 
     const postMessageToFlask = async (message)=>{
-        let response = await axios.post('http://192.168.193.79:5000/sendMessage', { userPrompt: message },{ headers: { 'Content-Type': 'application/json' } } );
+        let response = await axios.post('http://192.168.188.79:5000/sendMessage', { userPrompt: message },{ headers: { 'Content-Type': 'application/json' } } );
         const Response = response.data["response"]
 
         console.log('Parsed server response:', Response);
@@ -178,6 +170,7 @@ const chatPage = () => {
       }catch(err){
         console.error(err)
       }
+      await fetchMessages();
       
     }
 
@@ -193,26 +186,35 @@ const chatPage = () => {
             try{
               await db.runAsync(
                 `
-                  INSERT INTO ${item['TableName']} (sender , message) VALUES (?, ?);
-                `,
-                [
-                  sender,
-                  message
-                ]
+                  INSERT INTO ${item['TableName']} (sender , message) VALUES ('${sender}', '${message}');
+                  
+                `
             );
-            await postMessageToFlask(message);
-
             }
             catch(err){
-              console.log('error is happening here while inserting user messages')
+              console.log('error is happening inside the execAsync line 194')
               console.error(err)
             }
-            await fetchMessages();
+            
           }
           
         )
-
+        try{
+          await fetchMessages();
+          
+        }
+        catch{
+          console.log('error is happening while doing the fetch messages')
+        }
+        try{
+          await postMessageToFlask(message);
+          
+        }
+        catch{
+          console.log('error is happening while doing the postMessage to flask')
+        }
         
+        console.log('transaction completed and the message sent to the flask successfully!')
         textRef.current = "";
         if(inputRef) inputRef?.current?.clear();
 

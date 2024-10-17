@@ -15,6 +15,9 @@ import { useFocusEffect } from 'expo-router'
 import { useCallback } from 'react'
 import { KeyboardAvoidingView } from 'react-native'
 import { Platform } from 'react-native'
+
+//if I uncomment the create and delete file functionalities it is working now.
+
 const fileSpace = () => {
   //const documents = [{'id':1,'title':'gratitudeJournal','tableName':`userFile1`},{'id':2,'title':'Goals','tableName':`userFile2`},{'id':3,'title':'Journaling','tableName':'userFile3'}]
   const [files , setFiles] = useState(null);
@@ -26,6 +29,7 @@ const fileSpace = () => {
   console.log('files is initially' , files)
   console.log('newFileId is', newFileID);
 
+  //fetching all the tables
   useFocusEffect(
     useCallback(() => {
       // Re-fetch or update when screen comes into focus
@@ -35,39 +39,32 @@ const fileSpace = () => {
   
   //db opening
   const db = SQLite.useSQLiteContext()
-  useEffect(() => {
+  
+  /* useEffect(() => {
     loadDatabase().then(createTablesAtFirst)
       .catch((e) => console.error(e));
-  }, []);
+  }, []); */
 
-  useEffect(()=>{
-    db.withTransactionAsync(async ()=>{
-      await fetchAllTables();
-    })
-  } , [db])
+  /* useEffect(()=>{
+    fetchAllTables();
+  } , []) */
 
+
+  //this is called whenever a file is created or deleted and each time we come out of the readFile component back to the fileSpace
   const fetchAllTables = async ()=>{
     try{
-    const result = await db.getAllAsync(`SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'userFile%';`)
-    /* console.log('the list of all Tables are' , result) */
-    const tableNames = result.map(item=>item['name'])
-    /* console.log('table names are' , tableNames)  */
-    /* const allFileDetails = tableNames.map(async (tableName , index)=>{
-      let result = await fetchFileDetails(tableName);
-      return {'id':index , 'tableName':tableName , 'title':result[0]['entry']}
-    }) 
-    //fetchFileDetails('userFile1')
-    /* console.log('all file details fetched:') */
-    const allFileDetails = await fetchFileDetails();
-    console.log('all the files are:', allFileDetails)
-    const len = allFileDetails.length
-    console.log('length of all files is', len)
-    console.log('last file is:',allFileDetails[len-1])
-    const a = allFileDetails[len-1]['primaryID']
-    console.log('a value is',a)
-    //NewFileID should be a+1
-    setFiles(allFileDetails)
-    setNewFileID(a+1)//here is the issue. you can't set it like that. you have to set it to the 
+    
+    
+      const allFileDetails = await fetchFileDetails();
+      console.log('all the files are:', allFileDetails)
+      const len = allFileDetails.length
+      console.log('length of all files is', len)
+      console.log('last file is:',allFileDetails[len-1])
+      const a = allFileDetails[len-1]['primaryID']
+      console.log('a value is',a)
+      //NewFileID should be a+1
+      setFiles(allFileDetails)
+      setNewFileID(a+1)//here is the issue. you can't set it like that. you have to set it to the 
     }
     catch(err){
       console.log('error happened here')
@@ -77,6 +74,7 @@ const fileSpace = () => {
     
   }
 
+  //called only by the fetchFile detail function
   const fetchFileDetails = async ()=>{
     let result;
     try{
@@ -91,6 +89,8 @@ const fileSpace = () => {
     console.log('about to return')
     return result;
   }
+
+  //does not run in transaction. this function should be called only once. maybe try to keep this function independent of all the components
   const createTablesAtFirst = async ()=>{
     try{//create a primary id for all the userFile tables
       /* DROP TABLE IF EXISTS userFile1;
@@ -176,24 +176,6 @@ const fileSpace = () => {
     
 
   }
-  const handleSearch = ()=>{
-    console.log('search Is Handled')
-  }
-  const handleLongPress = (fileDetails)=>{
-    console.log('button is long pressed')
-    console.log('file details are:')
-    console.log(fileDetails)
-    setSelectedFile(fileDetails)
-    setlongPressOff(false)
-    setShowbuttons(true)
-
-  }
-  const handleOutsidePress = ()=>{
-    setShowbuttons(false)
-    setlongPressOff(true)
-    setSelectedFile({'id':0})
-    
-  }
   const handleDelete = async ()=>{
     console.log('inside handle delete')
     if(!selectedFile){
@@ -215,6 +197,27 @@ const fileSpace = () => {
     await fetchAllTables();
     setShowbuttons(false)
     setSelectedFile({'id':0})
+  }
+
+
+  //functions that dont interact with sqlite
+  const handleSearch = ()=>{
+    console.log('search Is Handled')
+  }
+  const handleLongPress = (fileDetails)=>{
+    console.log('button is long pressed')
+    console.log('file details are:')
+    console.log(fileDetails)
+    setSelectedFile(fileDetails)
+    setlongPressOff(false)
+    setShowbuttons(true)
+
+  }
+  const handleOutsidePress = ()=>{
+    setShowbuttons(false)
+    setlongPressOff(true)
+    setSelectedFile({'id':0})
+    
   }
   return (
     <TouchableWithoutFeedback onPress={handleOutsidePress}>
