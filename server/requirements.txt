@@ -1,0 +1,15 @@
+Flask
+requests
+ipython
+chromadb
+numpy
+firebase-admin
+pyngrok
+torch
+huggingface-hub
+transformers
+flask-cors
+python-docx
+sentence-transformers
+Werkzeug
+python-dotenv
