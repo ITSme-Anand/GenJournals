@@ -164,9 +164,11 @@ userInformation.add(
 
 print("User biodata has been successfully stored in the userInformation collection.")
 
+
+
 #ALL THE SETUP IS OVER NOW. WE HAVE TO CREATE FUNCTIONS AND ENDPOINTS AND THINGS WILL BE DONE
 
-# Define the abbreviations dictionary
+""" # Define the abbreviations dictionary
 abbreviations = {
     "idk": "I don't know",
     "brb": "be right back",
@@ -184,17 +186,13 @@ abbreviations = {
     "np": "no problem",
     "dm": "direct message",
     "ikr": "I know right"
-}
+} """
 
-""" # Mock database structures for demonstration purposes
-chatHistory = []  # List to simulate a chat history database
-gratitudeJournal = []  # List to simulate a gratitude journal database """
-
-# Define a preprocessing function to replace abbreviations in the user's prompt
+""" # Define a preprocessing function to replace abbreviations in the user's prompt
 def preprocess_text(text):
     pattern = re.compile(r'\b(' + '|'.join(re.escape(key) for key in abbreviations.keys()) + r')\b', re.IGNORECASE)
     processed_text = pattern.sub(lambda match: abbreviations[match.group(0).lower()], text)
-    return processed_text
+    return processed_text """
 
 # Define the promptCreator function
 def promptCreator(userPrompt, results):
@@ -222,14 +220,13 @@ def promptCreator(userPrompt, results):
     finalPrompt = userInfo + relevantContext + instructions
     return finalPrompt
 
-# Function to adjust the response tone
+""" # Function to adjust the response tone
 def handle_sad_message(response_text):
     if response_text.lower().startswith(("i'm sorry", "i am sorry", "i apologize", "sorry to hear")):
         motivational_start = "You're stronger than you realize. It’s okay to feel down sometimes, but I believe you can get through this."
         response_text = re.sub(r"^(i'm sorry|i am sorry|sorry to hear|i apologize).*", motivational_start, response_text, flags=re.IGNORECASE)
     return response_text
-
-
+ """
 #function to retrieve the context from the chroma DB
 def retrieveContext(searchQuery):
   queryEmbedding = get_embedding(searchQuery)
@@ -240,21 +237,13 @@ def retrieveContext(searchQuery):
   results = [ MHresults['documents'][0], GJresults['documents'][0], userInformationResults['documents'][0] , chatHistoryResults['documents'][0] ]
   return results
 
-
-
 def responseParser(response):
   finalResponse = ""
   return finalResponse
 
-
-
 # Function to store conversation (simulated here)
 def storeConversation(userPrompt, response_text):
     chatHistory.append((userPrompt, response_text))
-
-
-
-
 
 
 
@@ -315,9 +304,7 @@ def newMeFeature():
         return jsonify({'suggestions': improvement_suggestions}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-
-    
+        
 #whenever a new file is created in the user-file system , we create a collection here.
 @app.route('/createCollection', methods=['POST'])
 def createCollection():
@@ -331,8 +318,6 @@ def createCollection():
   except Exception as e:
     return jsonify({'error': str(e)}), 500
 
-
-
 #whenever a file is deleted in the user-file system , we delete the collection here
 @app.route('/deleteCollection', methods=['POST'])
 def deleteCollection():
@@ -345,7 +330,6 @@ def deleteCollection():
     return jsonify({'message': f'Collection "{collectionName}" deleted successfully'}), 200
   except Exception as e:
     return jsonify({'error': str(e)}), 500
-
 
 #whenever the user enters any gratitude journal or updates an existing entry , we add or update it in the gratitudeJournal collection
 @app.route('/updateGratitude', methods=['POST'])

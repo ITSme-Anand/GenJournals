@@ -7,11 +7,11 @@ app = Flask(__name__)
 
 
 import re
-import flask
-from flask import Flask, request, jsonify
+# import flask
+# from flask import Flask, request, jsonify
 
 # Initialize Flask app
-app = Flask(__name__)
+# app = Flask(__name__)
 
 # Import necessary libraries
 from IPython.display import display, HTML
@@ -31,10 +31,10 @@ from pyngrok import ngrok
 import uuid
 import torch
 from huggingface_hub import InferenceClient
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel, pipeline
 from flask_cors import CORS
 import datetime
-from transformers import pipeline
+# from transformers import pipeline
 import docx
 
 
@@ -44,14 +44,14 @@ app = Flask(__name__)
 # (Include all the existing code here, from userBiodata to the Flask routes)
 # ...
 
-
+require("dotenv").config()
 
 print("Flask app is running on http://127.0.0.1:5000")
 
 
 #HUGGINGFACE GATED-MODEL LOGIN
 from huggingface_hub import login
-login(token="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")
+login(token=process.env.API_KEY)
 
 #LLM MODEL SET UP
 if torch.cuda.is_available():
