@@ -1,4 +1,7 @@
 from typing import Literal
-def loadMemoryRouter()->Literal["Therapist","Responder"]:
-    return "load Memory Router"
+from app.agents.state import AgentState
+
+def loadMemoryRouter(state:AgentState)->Literal["Therapist","Responder"]:
+    if(state['useRetriever']=='True'):return "Therapist"
+    else: return "Responder"
 
