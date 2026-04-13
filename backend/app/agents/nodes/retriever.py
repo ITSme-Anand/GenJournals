@@ -1,0 +1,2 @@
+def retrieverNode():
+    return "retriever"

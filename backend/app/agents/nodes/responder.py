@@ -1,0 +1,2 @@
+def responderNode():
+    return "responder"

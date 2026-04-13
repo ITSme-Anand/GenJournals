@@ -1,0 +1,2 @@
+def therapistNode():
+    return "therapist"
