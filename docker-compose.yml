@@ -3,8 +3,19 @@ services:
     build: ./backend
     container_name: genjournals-backend
     ports:
-      - "8000:8000"
+      - "8000:8001"
     volumes:
       - ./backend:/app
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
+  
+  web:
+    build: ./web
+    container_name: genjounrals-frontend-web
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    depends_on:
+      - backend
